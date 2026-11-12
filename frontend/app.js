@@ -1,32 +1,32 @@
 const templates = {
   sum: {
     cpp: `#include <iostream>\nusing namespace std;\n\nint main() {\n  int arr[] = {2, 4, 6, 8, 10};\n  int sum = 0;\n\n  for (int i = 0; i < 5; i++) {\n    sum += arr[i];\n  }\n\n  cout << sum;\n}`,
-    python: `arr = [2, 4, 6, 8, 10]\ntotal = 0\n\nfor i in range(len(arr)):\n    total += arr[i]\n\nprint(total)`,
+    python: `raw = input()\nvalues = list(map(int, raw.split()))\ntotal = 0\n\nfor value in values:\n    total += value\n\nprint(total)`,
     javascript: `const arr = [2, 4, 6, 8, 10];\nlet sum = 0;\n\nfor (let i = 0; i < arr.length; i++) {\n  sum += arr[i];\n}\n\nconsole.log(sum);`
   },
   bubble_sort: {
     cpp: `#include <algorithm>\n\nvoid bubbleSort(int arr[], int n) {\n  for (int end = n - 1; end > 0; end--) {\n    for (int i = 0; i < end; i++) {\n      if (arr[i] > arr[i + 1]) {\n        swap(arr[i], arr[i + 1]);\n      }\n    }\n  }\n}`,
-    python: `def bubble_sort(values):\n    n = len(values)\n    for end in range(n - 1, 0, -1):\n        for i in range(end):\n            if values[i] > values[i + 1]:\n                values[i], values[i + 1] = values[i + 1], values[i]\n    return values`,
+    python: `values = list(map(int, input().split()))\nfor end in range(len(values) - 1, 0, -1):\n    for i in range(end):\n        if values[i] > values[i + 1]:\n            values[i], values[i + 1] = values[i + 1], values[i]\nprint(values)`,
     javascript: `function bubbleSort(values) {\n  for (let end = values.length - 1; end > 0; end--) {\n    for (let i = 0; i < end; i++) {\n      if (values[i] > values[i + 1]) {\n        [values[i], values[i + 1]] = [values[i + 1], values[i]];\n      }\n    }\n  }\n  return values;\n}`
   },
   binary_search: {
     cpp: `int binarySearch(int arr[], int low, int high, int target) {\n  if (low > high) return -1;\n  int mid = low + (high - low) / 2;\n  if (arr[mid] == target) return mid;\n  if (arr[mid] < target)\n    return binarySearch(arr, mid + 1, high, target);\n  return binarySearch(arr, low, mid - 1, target);\n}\n// initial call: binarySearch(arr, 0, n - 1, target)`,
-    python: `def binary_search(values, low, high, target):\n    if low > high:\n        return -1\n    mid = (low + high) // 2\n    if values[mid] == target:\n        return mid\n    if values[mid] < target:\n        return binary_search(values, mid + 1, high, target)\n    return binary_search(values, low, mid - 1, target)\n\n# initial call: binary_search(values, 0, len(values) - 1, target)`,
+    python: `items = list(map(int, input().split()))\nvalues, target = items[:-1], items[-1]\nlow, high = 0, len(values) - 1\nfound = -1\nwhile low <= high:\n    mid = (low + high) // 2\n    if values[mid] == target:\n        found = mid\n        break\n    if values[mid] < target:\n        low = mid + 1\n    else:\n        high = mid - 1\nprint(found)`,
     javascript: `function binarySearch(values, low, high, target) {\n  if (low > high) return -1;\n  const mid = Math.floor((low + high) / 2);\n  if (values[mid] === target) return mid;\n  if (values[mid] < target)\n    return binarySearch(values, mid + 1, high, target);\n  return binarySearch(values, low, mid - 1, target);\n}\n// initial call: binarySearch(values, 0, values.length - 1, target)`
   },
   sliding_window: {
     cpp: `int maxWindowSum(vector<int>& arr, int k) {\n  int windowSum = 0;\n  for (int i = 0; i < k; i++) windowSum += arr[i];\n  int best = windowSum;\n  for (int right = k; right < arr.size(); right++) {\n    windowSum += arr[right] - arr[right - k];\n    best = max(best, windowSum);\n  }\n  return best;\n}`,
-    python: `def max_window_sum(values, k):\n    window_sum = sum(values[:k])\n    best = window_sum\n    for right in range(k, len(values)):\n        window_sum += values[right] - values[right - k]\n        best = max(best, window_sum)\n    return best`,
+    python: `values = list(map(int, input().split()))\nk = 3\nwindow_sum = sum(values[:k])\nbest = window_sum\nfor right in range(k, len(values)):\n    window_sum += values[right] - values[right - k]\n    best = max(best, window_sum)\nprint(best)`,
     javascript: `function maxWindowSum(values, k) {\n  let sum = values.slice(0, k).reduce((a, b) => a + b, 0);\n  let best = sum;\n  for (let right = k; right < values.length; right++) {\n    sum += values[right] - values[right - k];\n    best = Math.max(best, sum);\n  }\n  return best;\n}`
   },
   two_pointers: {
     cpp: `pair<int, int> findPair(vector<int>& a, int target) {\n  int left = 0, right = a.size() - 1;\n  while (left < right) {\n    int sum = a[left] + a[right];\n    if (sum == target) return {left, right};\n    if (sum < target) left++;\n    else right--;\n  }\n  return {-1, -1};\n}`,
-    python: `def find_pair(values, target):\n    values.sort()\n    left, right = 0, len(values) - 1\n    while left < right:\n        total = values[left] + values[right]\n        if total == target:\n            return values[left], values[right]\n        if total < target:\n            left += 1\n        else:\n            right -= 1\n    return None`,
+    python: `items = list(map(int, input().split()))\nvalues, target = sorted(items[:-1]), items[-1]\nleft, right = 0, len(values) - 1\nfound = False\nwhile left < right:\n    total = values[left] + values[right]\n    if total == target:\n        print(values[left], values[right])\n        found = True\n        break\n    if total < target:\n        left += 1\n    else:\n        right -= 1\nprint(found)`,
     javascript: `function findPair(values, target) {\n  values.sort((a, b) => a - b);\n  let left = 0, right = values.length - 1;\n  while (left < right) {\n    const sum = values[left] + values[right];\n    if (sum === target) return [values[left], values[right]];\n    if (sum < target) left++;\n    else right--;\n  }\n  return null;\n}`
   },
   bfs: {
     cpp: `void bfs(vector<vector<int>>& graph, int start) {\n  queue<int> q;\n  vector<bool> seen(graph.size(), false);\n  q.push(start); seen[start] = true;\n  while (!q.empty()) {\n    int node = q.front(); q.pop();\n    for (int next : graph[node]) {\n      if (!seen[next]) {\n        seen[next] = true; q.push(next);\n      }\n    }\n  }\n}`,
-    python: `from collections import deque\n\ndef bfs(graph, start):\n    queue = deque([start])\n    seen = {start}\n    while queue:\n        node = queue.popleft()\n        for neighbor in graph[node]:\n            if neighbor not in seen:\n                seen.add(neighbor)\n                queue.append(neighbor)`,
+    python: `nodes = list(map(int, input().split()))\nqueue, seen, order = [0], [0], []\nwhile queue:\n    node = queue.pop(0)\n    order.append(nodes[node])\n    for neighbor in (node + 1, node + 2):\n        if neighbor < len(nodes) and neighbor not in seen:\n            seen.append(neighbor)\n            queue.append(neighbor)\nprint(order)`,
     javascript: `function bfs(graph, start) {\n  const queue = [start];\n  const seen = new Set([start]);\n  while (queue.length) {\n    const node = queue.shift();\n    for (const next of graph[node]) {\n      if (!seen.has(next)) {\n        seen.add(next); queue.push(next);\n      }\n    }\n  }\n}`
   }
 };
@@ -45,10 +45,10 @@ const lineMaps = {
   bfs: { python: { 1: 3, 6: 7, 8: 9, 9: 10, 12: 6 }, javascript: { 1: 1, 6: 5, 8: 7, 9: 8, 12: 4 } }
 };
 const elements = Object.fromEntries([
-  "code-input", "line-gutter", "language-select", "filename", "line-count", "sample-input", "input-summary", "target-input", "window-input", "target-label", "target-field", "window-field", "run-button", "run-state", "step-counter", "empty-state", "trace-content", "trace-step-label", "trace-summary", "array-track", "array-detail", "pointer-rail", "graph-section", "graph-svg", "variable-grid", "operation-tag", "operation-text", "condition-row", "call-stack-wrap", "stack-items", "recursion-section", "recursion-tree", "previous-button", "play-button", "play-icon", "play-label", "next-button", "progress-fill", "progress-knob", "progress-caption", "skip-button", "speed-select", "toast", "reset-code", "load-example", "new-session", "share-button"
+  "code-input", "line-gutter", "language-select", "filename", "line-count", "sample-input", "input-summary", "input-label-title", "input-label-hint", "input-help", "run-button", "run-state", "step-counter", "empty-state", "trace-content", "trace-step-label", "trace-summary", "sequence-section", "sequence-label", "array-track", "array-detail", "pointer-rail", "graph-section", "graph-svg", "variable-grid", "operation-tag", "operation-text", "condition-row", "call-stack-wrap", "stack-items", "recursion-section", "recursion-tree", "previous-button", "play-button", "play-icon", "play-label", "next-button", "progress-fill", "progress-knob", "progress-caption", "skip-button", "speed-select", "toast", "reset-code", "load-example", "clear-starter", "new-session", "share-button"
 ].map((id) => [id, document.getElementById(id)]));
 
-let selectedAlgorithm = "sum";
+let selectedAlgorithm = null;
 let steps = [];
 let currentStep = -1;
 let activeCodeLine = 0;
@@ -59,6 +59,7 @@ let traceRequestId = 0;
 let hasRunTrace = false;
 let lastSummary = "";
 let codeTemplateEdited = false;
+let traceTitle = "Custom Python program";
 
 function showToast(message) {
   elements.toast.textContent = message;
@@ -68,35 +69,12 @@ function showToast(message) {
 }
 
 function setCode(language = elements["language-select"].value) {
-  elements["code-input"].value = templates[selectedAlgorithm][language];
+  elements["code-input"].value = selectedAlgorithm ? templates[selectedAlgorithm][language] : "";
   codeTemplateEdited = false;
   activeCodeLine = 0;
-  syncCodeSample();
-  elements.filename.textContent = `${selectedAlgorithm === "sum" ? "main" : selectedAlgorithm}.${extensions[language]}`;
+  elements.filename.textContent = selectedAlgorithm ? `${selectedAlgorithm}.${extensions[language]}` : `untitled.${extensions[language]}`;
   updateGutter();
-}
-
-function syncCodeSample() {
-  if (codeTemplateEdited || selectedAlgorithm !== "sum") return;
-  let values;
-  try {
-    values = parseValues();
-  } catch {
-    return;
-  }
-  const literal = values.join(", ");
-  const language = elements["language-select"].value;
-  let code = templates.sum[language];
-  if (language === "cpp") {
-    code = code.replace(/int arr\[\] = \{[^}]*\};/, `int arr[] = {${literal}};`);
-    code = code.replace(/i < 5/g, `i < ${values.length}`);
-  } else if (language === "python") {
-    code = code.replace(/arr = \[[^\]]*\]/, `arr = [${literal}]`);
-  } else {
-    code = code.replace(/const arr = \[[^\]]*\];/, `const arr = [${literal}];`);
-  }
-  elements["code-input"].value = code;
-  updateGutter(activeCodeLine);
+  updateInputMode();
 }
 
 function updateGutter(activeLine = activeCodeLine) {
@@ -120,19 +98,17 @@ function updateGutter(activeLine = activeCodeLine) {
 
 function updateParameters() {
   const refreshTrace = hasRunTrace;
-  const showTarget = selectedAlgorithm === "binary_search" || selectedAlgorithm === "two_pointers";
-  const showWindow = selectedAlgorithm === "sliding_window";
-  elements["target-field"].classList.toggle("parameter-hidden", !showTarget);
-  elements["window-field"].classList.toggle("parameter-hidden", !showWindow);
-  elements["target-label"].textContent = selectedAlgorithm === "binary_search" ? "TARGET VALUE" : "TARGET SUM";
-  if (selectedAlgorithm === "binary_search") elements["sample-input"].value = "1, 3, 5, 7, 9, 11";
-  if (selectedAlgorithm === "two_pointers") elements["sample-input"].value = "1, 2, 4, 6, 8, 9";
-  if (selectedAlgorithm === "sum" || selectedAlgorithm === "bubble_sort" || selectedAlgorithm === "sliding_window" || selectedAlgorithm === "bfs") {
-    if (elements["sample-input"].value === "1, 3, 5, 7, 9, 11" || elements["sample-input"].value === "1, 2, 4, 6, 8, 9") elements["sample-input"].value = "2, 4, 6, 8, 10";
-  }
-  if (selectedAlgorithm === "binary_search") elements["target-input"].value = "7";
-  if (selectedAlgorithm === "two_pointers") elements["target-input"].value = "10";
-  syncCodeSample();
+  const examples = {
+    sum: "2 4 6 8 10",
+    bubble_sort: "5 1 4 2 8",
+    binary_search: "1 3 5 7 9 11 7",
+    sliding_window: "2 4 6 8 10",
+    two_pointers: "1 2 4 6 8 9 10",
+    bfs: "2 4 6 8 10"
+  };
+  elements["sample-input"].value = examples[selectedAlgorithm] || "";
+  elements["load-example"].disabled = !selectedAlgorithm;
+  elements["clear-starter"].disabled = !selectedAlgorithm;
   updateInputSummary();
   if (refreshTrace) scheduleTraceRefresh();
   else resetTrace();
@@ -144,6 +120,17 @@ function setAlgorithm(algorithm) {
   document.querySelectorAll(".algorithm-card").forEach((card) => card.classList.toggle("active", card.dataset.algorithm === algorithm));
   setCode();
   updateParameters();
+}
+
+function startBlankSession() {
+  selectedAlgorithm = null;
+  document.querySelectorAll(".algorithm-card").forEach((card) => card.classList.remove("active"));
+  elements["sample-input"].value = "";
+  elements["load-example"].disabled = true;
+  elements["clear-starter"].disabled = true;
+  setCode();
+  updateInputSummary();
+  resetTrace();
 }
 
 function resetTrace() {
@@ -168,17 +155,36 @@ function resetTrace() {
 }
 
 function updateInputSummary() {
-  const raw = elements["sample-input"].value.trim();
-  const tokens = raw ? raw.split(/[\s,]+/).filter(Boolean) : [];
-  const preview = tokens.slice(0, 5).join(", ");
-  const remainder = tokens.length > 5 ? `, +${tokens.length - 5} more` : "";
-  const targetText = elements["target-field"].classList.contains("parameter-hidden")
-    ? ""
-    : ` · target ${elements["target-input"].value || "—"}`;
-  const windowText = elements["window-field"].classList.contains("parameter-hidden")
-    ? ""
-    : ` · window ${elements["window-input"].value || "—"}`;
-  elements["input-summary"].textContent = `${tokens.length} ${tokens.length === 1 ? "value" : "values"} · ${preview || "empty"}${remainder}${targetText}${windowText}`;
+  const raw = elements["sample-input"].value;
+  if (!raw) {
+    elements["input-summary"].textContent = "0 characters · no input";
+    return;
+  }
+  const lineCount = raw.split(/\r\n|\r|\n/).length;
+  const preview = raw.slice(0, 48).replace(/\r/g, "\\r").replace(/\n/g, "\\n");
+  elements["input-summary"].textContent = `${raw.length} characters · ${lineCount} ${lineCount === 1 ? "line" : "lines"} · ${JSON.stringify(preview)}${raw.length > 48 ? "…" : ""}`;
+}
+
+function updateInputMode() {
+  const source = elements["code-input"].value;
+  const hasClass = /^\s*class\s+\w+/m.test(source);
+  const hasFunction = /^\s*def\s+\w+\s*\(/m.test(source);
+  if (hasClass) {
+    elements["input-label-title"].textContent = "METHOD ARGUMENTS";
+    elements["input-label-hint"].textContent = "JSON array · positional arguments";
+    elements["sample-input"].placeholder = 'Examples: [1, 2, 1] or [[2, 7, 11, 15], 9]';
+    elements["input-help"].textContent = "Single list arguments can be entered directly; for multiple parameters, use one JSON array of arguments.";
+  } else if (hasFunction) {
+    elements["input-label-title"].textContent = "FUNCTION ARGUMENTS";
+    elements["input-label-hint"].textContent = "JSON array · positional arguments";
+    elements["sample-input"].placeholder = 'Example: [5] or [1, 2, 1]';
+    elements["input-help"].textContent = "Arguments are supplied as JSON; a single list parameter may be entered directly.";
+  } else {
+    elements["input-label-title"].textContent = "PROGRAM INPUT";
+    elements["input-label-hint"].textContent = "raw stdin · one line per input()";
+    elements["sample-input"].placeholder = "Enter raw stdin. Use new lines for separate input() calls.";
+    elements["input-help"].textContent = "Passed as-is to input() · separate calls read separate lines";
+  }
 }
 
 function scheduleTraceRefresh() {
@@ -189,45 +195,22 @@ function scheduleTraceRefresh() {
   traceDebounce = setTimeout(() => runVisualization({ automatic: true }), 280);
 }
 
-function parseValues() {
-  const raw = elements["sample-input"].value.trim();
-  if (!raw) throw new Error("Enter at least one integer.");
-  const values = raw.split(/[\s,]+/).filter(Boolean).map((token) => {
-    if (!/^-?\d+$/.test(token)) throw new Error(`“${token}” is not an integer.`);
-    const value = Number(token);
-    if (!Number.isSafeInteger(value) || Math.abs(value) > 1_000_000) throw new Error("Use integers between −1,000,000 and 1,000,000.");
-    return value;
-  });
-  if (values.length > 16) throw new Error("Use 16 values or fewer for a clear visualization.");
-  return values;
-}
-
 async function runVisualization({ automatic = false } = {}) {
   stopPlayback();
   const requestId = ++traceRequestId;
   if (!automatic) {
     elements["run-button"].disabled = true;
     elements["run-state"].className = "run-state";
-    elements["run-state"].innerHTML = "<span></span> Preparing";
+    elements["run-state"].innerHTML = "<span></span> Analyzing code";
   }
   try {
-    const values = parseValues();
-    if (selectedAlgorithm === "binary_search" && values.some((value, index) => index > 0 && value < values[index - 1])) {
-      throw new Error("Binary search needs values in ascending order.");
-    }
-    const targetRaw = elements["target-input"].value.trim();
-    const targetValue = targetRaw ? Number(targetRaw) : Number.NaN;
-    const windowValue = Number(elements["window-input"].value.trim());
-    if ((selectedAlgorithm === "binary_search" || selectedAlgorithm === "two_pointers") && !Number.isInteger(targetValue)) throw new Error("Enter an integer target.");
-    if (selectedAlgorithm === "sliding_window" && (!Number.isInteger(windowValue) || windowValue < 1)) throw new Error("Window size must be a positive integer.");
-    const response = await fetch("/api/visualize", {
+    const response = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        algorithm: selectedAlgorithm,
-        values,
-        target: selectedAlgorithm === "binary_search" || selectedAlgorithm === "two_pointers" ? targetValue : null,
-        window_size: selectedAlgorithm === "sliding_window" ? windowValue : 3
+        code: elements["code-input"].value,
+        language: elements["language-select"].value,
+        sample_input: elements["sample-input"].value
       })
     });
     const result = await response.json();
@@ -236,6 +219,7 @@ async function runVisualization({ automatic = false } = {}) {
     steps = result.steps;
     lastSummary = result.summary;
     hasRunTrace = true;
+    traceTitle = result.title || "Custom Python program";
     currentStep = 0;
     elements["empty-state"].classList.add("hidden");
     elements["trace-content"].classList.remove("hidden");
@@ -250,14 +234,8 @@ async function runVisualization({ automatic = false } = {}) {
     if (!automatic) showToast(result.summary);
   } catch (error) {
     if (requestId !== traceRequestId) return;
-    if (automatic && hasRunTrace && steps.length) {
-      elements["run-state"].className = "run-state paused";
-      elements["run-state"].innerHTML = "<span></span> Input needs attention";
-      showToast(error.message);
-      return;
-    }
-    elements["run-state"].className = "run-state";
-    elements["run-state"].innerHTML = "<span></span> Ready";
+    elements["run-state"].className = hasRunTrace ? "run-state paused" : "run-state";
+    elements["run-state"].innerHTML = `<span></span> ${hasRunTrace ? "Code needs attention" : "Ready"}`;
     showToast(error.message || "Could not reach the AlgoLens API. Start the FastAPI server and try again.");
   } finally {
     if (requestId === traceRequestId) elements["run-button"].disabled = false;
@@ -267,12 +245,11 @@ async function runVisualization({ automatic = false } = {}) {
 function prettyValue(value) {
   if (Array.isArray(value)) return `[${value.join(", ")}]`;
   if (value === null || value === undefined) return "—";
+  if (typeof value === "object") {
+    if (value.__class__) return `<${value.__class__} instance>`;
+    return JSON.stringify(value);
+  }
   return String(value);
-}
-
-function sourceLine(logicalLine) {
-  const language = elements["language-select"].value;
-  return lineMaps[selectedAlgorithm]?.[language]?.[logicalLine] ?? logicalLine;
 }
 
 function renderStep() {
@@ -281,9 +258,11 @@ function renderStep() {
   const progress = steps.length <= 1 ? 100 : currentStep / (steps.length - 1) * 100;
   elements["step-counter"].innerHTML = `STEP <b>${currentStep + 1}</b> <span>OF ${steps.length}</span>`;
   elements["trace-summary"].textContent = lastSummary;
-  const highlightedLine = Math.min(sourceLine(step.line), elements["code-input"].value.split("\n").length);
-  elements["trace-step-label"].textContent = `${algorithmNames[selectedAlgorithm]} · line ${highlightedLine}`;
+  const highlightedLine = Math.min(step.line, elements["code-input"].value.split("\n").length);
+  elements["trace-step-label"].textContent = `${traceTitle} · line ${highlightedLine}`;
   elements["array-detail"].textContent = `${step.array.length} ${step.array.length === 1 ? "element" : "elements"}`;
+  elements["sequence-section"].classList.toggle("hidden", !step.sequence_name && step.array.length === 0);
+  elements["sequence-label"].textContent = step.sequence_name ? step.sequence_name.toUpperCase() : "SEQUENCE";
   elements["operation-text"].textContent = step.operation;
   elements["condition-row"].replaceChildren();
   if (step.condition) {
@@ -348,7 +327,8 @@ function renderStep() {
     item.textContent = frame;
     elements["stack-items"].append(item);
   });
-  elements["call-stack-wrap"].classList.toggle("hidden", selectedAlgorithm !== "binary_search");
+  const hasUserCallFrame = (step.call_stack || []).some((frame) => frame !== "<module>" && frame !== "main()");
+  elements["call-stack-wrap"].classList.toggle("hidden", !hasUserCallFrame && (selectedAlgorithm !== "binary_search" || codeTemplateEdited) && !traceTitle.includes("Recursive"));
   renderRecursionTree(step);
   elements["progress-fill"].style.width = `${progress}%`;
   elements["progress-knob"].style.left = `${progress}%`;
@@ -369,7 +349,7 @@ function renderStep() {
 }
 
 function renderGraph(step) {
-  const isGraph = selectedAlgorithm === "bfs";
+  const isGraph = selectedAlgorithm === "bfs" && !codeTemplateEdited && traceTitle.includes("BFS");
   elements["graph-section"].classList.toggle("hidden", !isGraph);
   if (!isGraph) return;
   const values = step.array;
@@ -409,7 +389,7 @@ function renderGraph(step) {
 }
 
 function renderRecursionTree(step) {
-  const isRecursive = selectedAlgorithm === "binary_search";
+  const isRecursive = selectedAlgorithm === "binary_search" && (step.call_tree || []).length > 0;
   elements["recursion-section"].classList.toggle("hidden", !isRecursive);
   if (!isRecursive) return;
   elements["recursion-tree"].replaceChildren();
@@ -472,6 +452,11 @@ function stepBy(amount) {
 
 function bindEvents() {
   document.querySelectorAll(".algorithm-card").forEach((card) => card.addEventListener("click", () => setAlgorithm(card.dataset.algorithm)));
+  elements["clear-starter"].addEventListener("click", () => {
+    if (!selectedAlgorithm) return;
+    startBlankSession();
+    showToast("Starter cleared. You can write your own code.");
+  });
   elements["language-select"].addEventListener("change", () => {
     setCode();
     if (hasRunTrace) renderStep();
@@ -479,17 +464,10 @@ function bindEvents() {
   elements["code-input"].addEventListener("input", () => {
     codeTemplateEdited = true;
     updateGutter();
+    updateInputMode();
+    scheduleTraceRefresh();
   });
   elements["sample-input"].addEventListener("input", () => {
-    updateInputSummary();
-    syncCodeSample();
-    scheduleTraceRefresh();
-  });
-  elements["target-input"].addEventListener("input", () => {
-    updateInputSummary();
-    scheduleTraceRefresh();
-  });
-  elements["window-input"].addEventListener("input", () => {
     updateInputSummary();
     scheduleTraceRefresh();
   });
@@ -499,16 +477,19 @@ function bindEvents() {
   elements["next-button"].addEventListener("click", () => stepBy(1));
   elements["play-button"].addEventListener("click", togglePlayback);
   elements["skip-button"].addEventListener("click", () => { stopPlayback(); currentStep = steps.length - 1; renderStep(); });
-  elements["reset-code"].addEventListener("click", () => { setCode(); showToast("Example template restored."); });
+  elements["reset-code"].addEventListener("click", () => {
+    setCode();
+    if (selectedAlgorithm) scheduleTraceRefresh();
+    else resetTrace();
+    showToast(selectedAlgorithm ? "Starter program restored." : "Editor cleared.");
+  });
   elements["load-example"].addEventListener("click", () => {
-    elements["sample-input"].value = selectedAlgorithm === "binary_search" ? "1, 3, 5, 7, 9, 11" : selectedAlgorithm === "two_pointers" ? "1, 2, 4, 6, 8, 9" : "2, 4, 6, 8, 10";
-    elements["target-input"].value = selectedAlgorithm === "binary_search" ? "7" : "10";
-    elements["window-input"].value = "3";
+    updateParameters();
+    setCode();
     updateInputSummary();
-    syncCodeSample();
     scheduleTraceRefresh();
   });
-  elements["new-session"].addEventListener("click", () => { setAlgorithm("sum"); showToast("New visualization session ready."); });
+  elements["new-session"].addEventListener("click", () => { startBlankSession(); showToast("Blank code session ready."); });
   elements["share-button"].addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
@@ -530,4 +511,9 @@ function bindEvents() {
 
 bindEvents();
 setCode();
-updateParameters();
+elements["sample-input"].value = "";
+elements["load-example"].disabled = true;
+elements["clear-starter"].disabled = true;
+updateInputMode();
+updateInputSummary();
+resetTrace();

@@ -9,6 +9,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from app.analyzer import AnalysisError, analyze_python
+
 ROOT = Path(__file__).resolve().parents[2]
 FRONTEND = ROOT / "frontend"
 
@@ -22,11 +24,18 @@ class VisualizeRequest(BaseModel):
     window_size: int = Field(default=3, ge=1, le=16)
 
 
+class CodeAnalysisRequest(BaseModel):
+    code: str = Field(min_length=1, max_length=8_000)
+    language: str = "python"
+    sample_input: str = Field(default="", max_length=512)
+
+
 class TraceStep(BaseModel):
     line: int
     operation: str
     variables: dict[str, Any]
-    array: list[int]
+    array: list[Any]
+    sequence_name: str | None = None
     active_indices: list[int] = Field(default_factory=list)
     compare_indices: list[int] = Field(default_factory=list)
     sorted_indices: list[int] = Field(default_factory=list)
@@ -282,6 +291,17 @@ def health() -> dict[str, str]:
 @app.get("/api/algorithms")
 def algorithms() -> list[dict[str, str]]:
     return [{"id": key, "name": name} for key, (name, _) in TRACE_BUILDERS.items()]
+
+
+@app.post("/api/analyze", response_model=VisualizeResponse)
+def analyze_code(request: CodeAnalysisRequest) -> VisualizeResponse:
+    if request.language != "python":
+        raise HTTPException(status_code=400, detail="Safe code-aware dry runs currently support Python. Select Python or use a built-in algorithm template.")
+    try:
+        result = analyze_python(request.code, request.sample_input)
+    except AnalysisError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error
+    return VisualizeResponse(**result)
 
 
 @app.post("/api/visualize", response_model=VisualizeResponse)
