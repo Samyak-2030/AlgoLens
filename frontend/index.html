@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="AlgoLens makes algorithms visible, one step at a time.">
+  <title>AlgoLens — See your code think</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="AlgoLens home">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span>algo<span class="brand-light">lens</span></span>
+      </a>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="primary-nav" aria-label="Main navigation">
+        <a class="nav-item active" href="#studio"><span class="nav-icon">◫</span> Visualizer <span class="nav-dot"></span></a>
+        <a class="nav-item" href="#algorithms"><span class="nav-icon">⌘</span> Algorithms</a>
+        <a class="nav-item" href="#how-it-works"><span class="nav-icon">◷</span> How it works</a>
+      </nav>
+      <div class="sidebar-divider"></div>
+      <div class="workspace-label recent-label">RECENT SESSIONS <button class="icon-button" title="New session" aria-label="New session" id="new-session">＋</button></div>
+      <button class="session-item selected"><span class="session-file">▤</span><span><b>array-sum.cpp</b><small>Just now · C++</small></span></button>
+      <button class="session-item"><span class="session-file">▤</span><span><b>binary-search.py</b><small>Yesterday · Python</small></span></button>
+      <div class="sidebar-bottom">
+        <div class="tip-card"><span class="tip-spark">✦</span><b>Learn by seeing</b><p>Step through an algorithm and watch every value change.</p></div>
+        <a class="sample-link" href="/sample.png" target="_blank" rel="noreferrer">View sample UI <span>↗</span></a>
+        <div class="profile"><div class="avatar">A</div><div><b>Algorithm learner</b><small>Free workspace</small></div><span class="profile-menu">···</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="studio">
+      <header class="topbar">
+        <div class="breadcrumbs"><span>Workspace</span><span class="crumb-slash">/</span><b>Visualizer</b></div>
+        <div class="topbar-actions"><span class="saved-status"><i></i> All changes saved</span><button class="share-button" id="share-button"><span>↗</span> Share</button><button class="avatar small-avatar" aria-label="Account">A</button></div>
+      </header>
+      <section class="page-heading">
+        <div><div class="eyebrow"><span class="eyebrow-line"></span> ALGORITHM PLAYGROUND</div><h1>See your code <span>think.</span></h1><p>Run it. Step through it. Understand every move.</p></div>
+        <div class="heading-badge"><span class="live-pulse"></span> Interactive workspace</div>
+      </section>
+
+      <section class="workbench" aria-label="Code and visualization workspace">
+        <section class="panel editor-panel" aria-labelledby="editor-heading">
+          <div class="panel-header editor-header">
+            <div class="panel-title-wrap"><span class="panel-icon code-icon">&lt;/&gt;</span><div><h2 id="editor-heading">Code editor</h2><p>Inspect a template for the selected pattern</p></div></div>
+            <label class="select-wrap language-select"><span class="sr-only">Programming language</span><select id="language-select"><option value="cpp">C++</option><option value="python">Python</option><option value="javascript">JavaScript</option></select><span class="select-chevron">⌄</span></label>
+          </div>
+          <div class="editor-toolbar"><div class="file-tab"><span class="file-dot"></span><span id="filename">main.cpp</span><span class="tab-close">×</span></div><button class="quiet-button" id="reset-code" title="Restore example">↺ <span>Reset</span></button></div>
+          <div class="code-editor"><div class="line-gutter" id="line-gutter" aria-hidden="true"></div><textarea id="code-input" aria-label="Code editor" spellcheck="false" autocapitalize="off"></textarea></div>
+          <div class="editor-footer"><span><span class="kbd">⌘</span> + <span class="kbd">↵</span> to run</span><span id="line-count">12 lines</span></div>
+          <div class="input-section">
+            <div class="section-heading"><div><span class="section-number">01</span><h3>Sample input</h3></div><button class="text-button" id="load-example">Use example</button></div>
+            <label class="input-label" for="sample-input">ARRAY VALUES <span>comma separated</span></label>
+            <input id="sample-input" class="sample-input" value="2, 4, 6, 8, 10" autocomplete="off" spellcheck="false">
+            <div class="parameter-row" id="parameter-row">
+              <label class="parameter-field" id="target-field"><span id="target-label">TARGET VALUE</span><input id="target-input" value="14" inputmode="numeric"></label>
+              <label class="parameter-field" id="window-field"><span>WINDOW SIZE</span><input id="window-input" value="3" inputmode="numeric"></label>
+            </div>
+            <div class="input-hint"><span>↳</span> Safe built-in trace · custom code is not executed</div>
+            <button class="run-button" id="run-button"><span class="run-icon">▶</span><span>Visualize code</span><span class="run-shortcut">⌘ ↵</span></button>
+          </div>
+        </section>
+
+        <section class="panel visualizer-panel" aria-labelledby="visualizer-heading">
+          <div class="panel-header visual-header">
+            <div class="panel-title-wrap"><span class="panel-icon viz-icon">✳</span><div><h2 id="visualizer-heading">Execution visualizer</h2><p>Follow every step as it happens</p></div></div>
+            <div class="run-state" id="run-state"><span></span> Ready</div>
+          </div>
+          <div class="visual-toolbar"><div class="step-counter" id="step-counter">STEP <b>0</b> <span>OF 0</span></div><div class="speed-control"><span>Speed</span><select id="speed-select" aria-label="Playback speed"><option value="1000">1×</option><option value="600">1.5×</option><option value="300">2×</option></select></div></div>
+          <div class="visual-stage" id="visual-stage">
+            <div class="empty-state" id="empty-state"><div class="empty-art"><span class="empty-orbit orbit-one"></span><span class="empty-orbit orbit-two"></span><span class="empty-center">▶</span><span class="empty-node node-a">x</span><span class="empty-node node-b">i</span><span class="empty-node node-c">Σ</span></div><h3>Your algorithm, in motion.</h3><p>Enter some values and run the visualizer<br>to see what happens under the hood.</p><div class="empty-tags"><span>Variables</span><span>Arrays</span><span>Control flow</span></div></div>
+            <div class="trace-content hidden" id="trace-content">
+              <div class="trace-topline"><span class="trace-label">LIVE TRACE</span><span class="trace-step-label" id="trace-step-label">Initializing…</span></div>
+              <div class="array-section"><div class="module-label"><span>ARRAY</span><span class="module-detail" id="array-detail">5 elements</span></div><div class="array-track" id="array-track"></div><div class="pointer-rail" id="pointer-rail"></div></div>
+              <div class="graph-section hidden" id="graph-section"><div class="module-label"><span>GRAPH · ADJACENCY LIST</span><span class="module-detail">NEXT 1 OR 2 NODES</span></div><div class="graph-viewport"><svg id="graph-svg" role="img" aria-label="Breadth-first search graph"></svg></div></div>
+              <div class="variable-section"><div class="module-label"><span>VARIABLES</span><span class="module-detail">CURRENT SCOPE</span></div><div class="variable-grid" id="variable-grid"></div></div>
+              <div class="operation-card"><div class="operation-head"><span class="operation-indicator"></span><span>CURRENT OPERATION</span><span class="operation-tag" id="operation-tag">RUNNING</span></div><div class="operation-text" id="operation-text">Waiting for first step</div><div class="condition-row" id="condition-row"></div></div>
+              <div class="call-stack" id="call-stack-wrap"><div class="module-label"><span>CALL STACK</span><span class="module-detail">FUNCTION FRAMES</span></div><div class="stack-items" id="stack-items"></div></div>
+              <div class="recursion-section hidden" id="recursion-section"><div class="module-label"><span>RECURSION TREE</span><span class="module-detail">CALL PATH</span></div><div class="recursion-tree" id="recursion-tree"></div></div>
+            </div>
+          </div>
+          <div class="execution-footer"><div class="playback-controls"><button class="step-button" id="previous-button" disabled aria-label="Previous step">‹</button><button class="play-button" id="play-button" disabled><span id="play-icon">▶</span><span id="play-label">Play</span></button><button class="step-button" id="next-button" disabled aria-label="Next step">›</button></div><div class="progress-track"><div class="progress-fill" id="progress-fill"></div><span class="progress-knob" id="progress-knob"></span></div><div class="progress-labels"><span id="progress-caption">Run the code to begin</span><button id="skip-button" disabled>Skip to end <span>→</span></button></div></div>
+        </section>
+      </section>
+
+      <section class="algorithm-section" id="algorithms"><div class="algorithm-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PICK A PATH</div><h2>Explore an algorithm</h2></div><a href="#studio" class="browse-link">All algorithms <span>↗</span></a></div><div class="algorithm-grid">
+        <button class="algorithm-card active" data-algorithm="sum"><span class="algorithm-symbol sum-symbol">Σ</span><span class="algorithm-copy"><b>Array sum</b><small>Iteration · Variables</small></span><span class="algorithm-arrow">↗</span></button>
+        <button class="algorithm-card" data-algorithm="bubble_sort"><span class="algorithm-symbol sort-symbol">↕</span><span class="algorithm-copy"><b>Bubble sort</b><small>Sorting · Comparisons</small></span><span class="algorithm-arrow">↗</span></button>
+        <button class="algorithm-card" data-algorithm="binary_search"><span class="algorithm-symbol search-symbol">⌕</span><span class="algorithm-copy"><b>Binary search</b><small>Search · Divide &amp; conquer</small></span><span class="algorithm-arrow">↗</span></button>
+        <button class="algorithm-card" data-algorithm="sliding_window"><span class="algorithm-symbol window-symbol">▱</span><span class="algorithm-copy"><b>Sliding window</b><small>Arrays · Window patterns</small></span><span class="algorithm-arrow">↗</span></button>
+        <button class="algorithm-card" data-algorithm="two_pointers"><span class="algorithm-symbol pointer-symbol">⇆</span><span class="algorithm-copy"><b>Two pointers</b><small>Arrays · Pair search</small></span><span class="algorithm-arrow">↗</span></button>
+        <button class="algorithm-card" data-algorithm="bfs"><span class="algorithm-symbol graph-symbol">⌘</span><span class="algorithm-copy"><b>Graph traversal</b><small>BFS · Queue operations</small></span><span class="algorithm-arrow">↗</span></button>
+      </div></section>
+      <footer class="page-footer" id="how-it-works"><span><span class="footer-mark">✳</span> Built for the curious mind.</span><span>AlgoLens <span class="footer-separator">·</span> Make the invisible visible</span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
