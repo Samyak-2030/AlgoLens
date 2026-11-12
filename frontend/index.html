@@ -49,7 +49,7 @@
       <section class="workbench" aria-label="Code and visualization workspace">
         <section class="panel editor-panel" aria-labelledby="editor-heading">
           <div class="panel-header editor-header">
-            <div class="panel-title-wrap"><span class="panel-icon code-icon">&lt;/&gt;</span><div><h2 id="editor-heading">Code editor</h2><p>Inspect a template for the selected pattern</p></div></div>
+            <div class="panel-title-wrap"><span class="panel-icon code-icon">&lt;/&gt;</span><div><h2 id="editor-heading">Code template</h2><p>Reference implementation for this algorithm</p></div></div>
             <label class="select-wrap language-select"><span class="sr-only">Programming language</span><select id="language-select"><option value="cpp">C++</option><option value="python">Python</option><option value="javascript">JavaScript</option></select><span class="select-chevron">⌄</span></label>
           </div>
           <div class="editor-toolbar"><div class="file-tab"><span class="file-dot"></span><span id="filename">main.cpp</span><span class="tab-close">×</span></div><button class="quiet-button" id="reset-code" title="Restore example">↺ <span>Reset</span></button></div>
@@ -59,11 +59,12 @@
             <div class="section-heading"><div><span class="section-number">01</span><h3>Sample input</h3></div><button class="text-button" id="load-example">Use example</button></div>
             <label class="input-label" for="sample-input">ARRAY VALUES <span>comma separated</span></label>
             <input id="sample-input" class="sample-input" value="2, 4, 6, 8, 10" autocomplete="off" spellcheck="false">
+            <div class="input-summary" id="input-summary" aria-live="polite">5 values · 2, 4, 6, 8, 10</div>
             <div class="parameter-row" id="parameter-row">
               <label class="parameter-field" id="target-field"><span id="target-label">TARGET VALUE</span><input id="target-input" value="14" inputmode="numeric"></label>
               <label class="parameter-field" id="window-field"><span>WINDOW SIZE</span><input id="window-input" value="3" inputmode="numeric"></label>
             </div>
-            <div class="input-hint"><span>↳</span> Safe built-in trace · custom code is not executed</div>
+            <div class="input-hint"><span>↳</span> Trace refreshes as inputs change · template code is not executed</div>
             <button class="run-button" id="run-button"><span class="run-icon">▶</span><span>Visualize code</span><span class="run-shortcut">⌘ ↵</span></button>
           </div>
         </section>
@@ -78,6 +79,7 @@
             <div class="empty-state" id="empty-state"><div class="empty-art"><span class="empty-orbit orbit-one"></span><span class="empty-orbit orbit-two"></span><span class="empty-center">▶</span><span class="empty-node node-a">x</span><span class="empty-node node-b">i</span><span class="empty-node node-c">Σ</span></div><h3>Your algorithm, in motion.</h3><p>Enter some values and run the visualizer<br>to see what happens under the hood.</p><div class="empty-tags"><span>Variables</span><span>Arrays</span><span>Control flow</span></div></div>
             <div class="trace-content hidden" id="trace-content">
               <div class="trace-topline"><span class="trace-label">LIVE TRACE</span><span class="trace-step-label" id="trace-step-label">Initializing…</span></div>
+              <div class="trace-summary" id="trace-summary" aria-live="polite"></div>
               <div class="array-section"><div class="module-label"><span>ARRAY</span><span class="module-detail" id="array-detail">5 elements</span></div><div class="array-track" id="array-track"></div><div class="pointer-rail" id="pointer-rail"></div></div>
               <div class="graph-section hidden" id="graph-section"><div class="module-label"><span>GRAPH · ADJACENCY LIST</span><span class="module-detail">NEXT 1 OR 2 NODES</span></div><div class="graph-viewport"><svg id="graph-svg" role="img" aria-label="Breadth-first search graph"></svg></div></div>
               <div class="variable-section"><div class="module-label"><span>VARIABLES</span><span class="module-detail">CURRENT SCOPE</span></div><div class="variable-grid" id="variable-grid"></div></div>

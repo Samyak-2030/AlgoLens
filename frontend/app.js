@@ -45,7 +45,7 @@ const lineMaps = {
   bfs: { python: { 1: 3, 6: 7, 8: 9, 9: 10, 12: 6 }, javascript: { 1: 1, 6: 5, 8: 7, 9: 8, 12: 4 } }
 };
 const elements = Object.fromEntries([
-  "code-input", "line-gutter", "language-select", "filename", "line-count", "sample-input", "target-input", "window-input", "target-label", "target-field", "window-field", "run-button", "run-state", "step-counter", "empty-state", "trace-content", "trace-step-label", "array-track", "array-detail", "pointer-rail", "graph-section", "graph-svg", "variable-grid", "operation-tag", "operation-text", "condition-row", "call-stack-wrap", "stack-items", "recursion-section", "recursion-tree", "previous-button", "play-button", "play-icon", "play-label", "next-button", "progress-fill", "progress-knob", "progress-caption", "skip-button", "speed-select", "toast", "reset-code", "load-example", "new-session", "share-button"
+  "code-input", "line-gutter", "language-select", "filename", "line-count", "sample-input", "input-summary", "target-input", "window-input", "target-label", "target-field", "window-field", "run-button", "run-state", "step-counter", "empty-state", "trace-content", "trace-step-label", "trace-summary", "array-track", "array-detail", "pointer-rail", "graph-section", "graph-svg", "variable-grid", "operation-tag", "operation-text", "condition-row", "call-stack-wrap", "stack-items", "recursion-section", "recursion-tree", "previous-button", "play-button", "play-icon", "play-label", "next-button", "progress-fill", "progress-knob", "progress-caption", "skip-button", "speed-select", "toast", "reset-code", "load-example", "new-session", "share-button"
 ].map((id) => [id, document.getElementById(id)]));
 
 let selectedAlgorithm = "sum";
@@ -54,6 +54,11 @@ let currentStep = -1;
 let activeCodeLine = 0;
 let timer = null;
 let toastTimer = null;
+let traceDebounce = null;
+let traceRequestId = 0;
+let hasRunTrace = false;
+let lastSummary = "";
+let codeTemplateEdited = false;
 
 function showToast(message) {
   elements.toast.textContent = message;
@@ -64,8 +69,34 @@ function showToast(message) {
 
 function setCode(language = elements["language-select"].value) {
   elements["code-input"].value = templates[selectedAlgorithm][language];
+  codeTemplateEdited = false;
+  activeCodeLine = 0;
+  syncCodeSample();
   elements.filename.textContent = `${selectedAlgorithm === "sum" ? "main" : selectedAlgorithm}.${extensions[language]}`;
   updateGutter();
+}
+
+function syncCodeSample() {
+  if (codeTemplateEdited || selectedAlgorithm !== "sum") return;
+  let values;
+  try {
+    values = parseValues();
+  } catch {
+    return;
+  }
+  const literal = values.join(", ");
+  const language = elements["language-select"].value;
+  let code = templates.sum[language];
+  if (language === "cpp") {
+    code = code.replace(/int arr\[\] = \{[^}]*\};/, `int arr[] = {${literal}};`);
+    code = code.replace(/i < 5/g, `i < ${values.length}`);
+  } else if (language === "python") {
+    code = code.replace(/arr = \[[^\]]*\]/, `arr = [${literal}]`);
+  } else {
+    code = code.replace(/const arr = \[[^\]]*\];/, `const arr = [${literal}];`);
+  }
+  elements["code-input"].value = code;
+  updateGutter(activeCodeLine);
 }
 
 function updateGutter(activeLine = activeCodeLine) {
@@ -88,6 +119,7 @@ function updateGutter(activeLine = activeCodeLine) {
 }
 
 function updateParameters() {
+  const refreshTrace = hasRunTrace;
   const showTarget = selectedAlgorithm === "binary_search" || selectedAlgorithm === "two_pointers";
   const showWindow = selectedAlgorithm === "sliding_window";
   elements["target-field"].classList.toggle("parameter-hidden", !showTarget);
@@ -100,7 +132,10 @@ function updateParameters() {
   }
   if (selectedAlgorithm === "binary_search") elements["target-input"].value = "7";
   if (selectedAlgorithm === "two_pointers") elements["target-input"].value = "10";
-  resetTrace();
+  syncCodeSample();
+  updateInputSummary();
+  if (refreshTrace) scheduleTraceRefresh();
+  else resetTrace();
 }
 
 function setAlgorithm(algorithm) {
@@ -113,6 +148,9 @@ function setAlgorithm(algorithm) {
 
 function resetTrace() {
   stopPlayback();
+  clearTimeout(traceDebounce);
+  traceRequestId += 1;
+  hasRunTrace = false;
   steps = [];
   currentStep = -1;
   activeCodeLine = 0;
@@ -124,8 +162,31 @@ function resetTrace() {
   elements["progress-fill"].style.width = "0%";
   elements["progress-knob"].style.left = "0%";
   elements["progress-caption"].textContent = "Run the code to begin";
+  elements["trace-summary"].textContent = "";
   ["previous-button", "play-button", "next-button", "skip-button"].forEach((id) => { elements[id].disabled = true; });
   updateGutter();
+}
+
+function updateInputSummary() {
+  const raw = elements["sample-input"].value.trim();
+  const tokens = raw ? raw.split(/[\s,]+/).filter(Boolean) : [];
+  const preview = tokens.slice(0, 5).join(", ");
+  const remainder = tokens.length > 5 ? `, +${tokens.length - 5} more` : "";
+  const targetText = elements["target-field"].classList.contains("parameter-hidden")
+    ? ""
+    : ` · target ${elements["target-input"].value || "—"}`;
+  const windowText = elements["window-field"].classList.contains("parameter-hidden")
+    ? ""
+    : ` · window ${elements["window-input"].value || "—"}`;
+  elements["input-summary"].textContent = `${tokens.length} ${tokens.length === 1 ? "value" : "values"} · ${preview || "empty"}${remainder}${targetText}${windowText}`;
+}
+
+function scheduleTraceRefresh() {
+  clearTimeout(traceDebounce);
+  traceRequestId += 1;
+  elements["run-state"].className = "run-state running";
+  elements["run-state"].innerHTML = `<span></span> ${hasRunTrace ? "Updating" : "Preparing"}`;
+  traceDebounce = setTimeout(() => runVisualization({ automatic: true }), 280);
 }
 
 function parseValues() {
@@ -141,18 +202,22 @@ function parseValues() {
   return values;
 }
 
-async function runVisualization() {
+async function runVisualization({ automatic = false } = {}) {
   stopPlayback();
-  elements["run-button"].disabled = true;
-  elements["run-state"].className = "run-state";
-  elements["run-state"].innerHTML = "<span></span> Preparing";
+  const requestId = ++traceRequestId;
+  if (!automatic) {
+    elements["run-button"].disabled = true;
+    elements["run-state"].className = "run-state";
+    elements["run-state"].innerHTML = "<span></span> Preparing";
+  }
   try {
     const values = parseValues();
     if (selectedAlgorithm === "binary_search" && values.some((value, index) => index > 0 && value < values[index - 1])) {
       throw new Error("Binary search needs values in ascending order.");
     }
-    const targetValue = Number(elements["target-input"].value);
-    const windowValue = Number(elements["window-input"].value);
+    const targetRaw = elements["target-input"].value.trim();
+    const targetValue = targetRaw ? Number(targetRaw) : Number.NaN;
+    const windowValue = Number(elements["window-input"].value.trim());
     if ((selectedAlgorithm === "binary_search" || selectedAlgorithm === "two_pointers") && !Number.isInteger(targetValue)) throw new Error("Enter an integer target.");
     if (selectedAlgorithm === "sliding_window" && (!Number.isInteger(windowValue) || windowValue < 1)) throw new Error("Window size must be a positive integer.");
     const response = await fetch("/api/visualize", {
@@ -167,7 +232,10 @@ async function runVisualization() {
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.detail || "Unable to create the trace.");
+    if (requestId !== traceRequestId) return;
     steps = result.steps;
+    lastSummary = result.summary;
+    hasRunTrace = true;
     currentStep = 0;
     elements["empty-state"].classList.add("hidden");
     elements["trace-content"].classList.remove("hidden");
@@ -175,13 +243,24 @@ async function runVisualization() {
     elements["run-state"].innerHTML = "<span></span> Paused";
     ["previous-button", "play-button", "next-button", "skip-button"].forEach((id) => { elements[id].disabled = false; });
     renderStep();
-    showToast(result.summary);
+    if (automatic) {
+      elements["run-state"].className = "run-state";
+      elements["run-state"].innerHTML = "<span></span> Updated";
+    }
+    if (!automatic) showToast(result.summary);
   } catch (error) {
+    if (requestId !== traceRequestId) return;
+    if (automatic && hasRunTrace && steps.length) {
+      elements["run-state"].className = "run-state paused";
+      elements["run-state"].innerHTML = "<span></span> Input needs attention";
+      showToast(error.message);
+      return;
+    }
     elements["run-state"].className = "run-state";
     elements["run-state"].innerHTML = "<span></span> Ready";
     showToast(error.message || "Could not reach the AlgoLens API. Start the FastAPI server and try again.");
   } finally {
-    elements["run-button"].disabled = false;
+    if (requestId === traceRequestId) elements["run-button"].disabled = false;
   }
 }
 
@@ -201,6 +280,7 @@ function renderStep() {
   const step = steps[currentStep];
   const progress = steps.length <= 1 ? 100 : currentStep / (steps.length - 1) * 100;
   elements["step-counter"].innerHTML = `STEP <b>${currentStep + 1}</b> <span>OF ${steps.length}</span>`;
+  elements["trace-summary"].textContent = lastSummary;
   const highlightedLine = Math.min(sourceLine(step.line), elements["code-input"].value.split("\n").length);
   elements["trace-step-label"].textContent = `${algorithmNames[selectedAlgorithm]} · line ${highlightedLine}`;
   elements["array-detail"].textContent = `${step.array.length} ${step.array.length === 1 ? "element" : "elements"}`;
@@ -392,8 +472,27 @@ function stepBy(amount) {
 
 function bindEvents() {
   document.querySelectorAll(".algorithm-card").forEach((card) => card.addEventListener("click", () => setAlgorithm(card.dataset.algorithm)));
-  elements["language-select"].addEventListener("change", () => setCode());
-  elements["code-input"].addEventListener("input", () => updateGutter());
+  elements["language-select"].addEventListener("change", () => {
+    setCode();
+    if (hasRunTrace) renderStep();
+  });
+  elements["code-input"].addEventListener("input", () => {
+    codeTemplateEdited = true;
+    updateGutter();
+  });
+  elements["sample-input"].addEventListener("input", () => {
+    updateInputSummary();
+    syncCodeSample();
+    scheduleTraceRefresh();
+  });
+  elements["target-input"].addEventListener("input", () => {
+    updateInputSummary();
+    scheduleTraceRefresh();
+  });
+  elements["window-input"].addEventListener("input", () => {
+    updateInputSummary();
+    scheduleTraceRefresh();
+  });
   elements["code-input"].addEventListener("scroll", () => { elements["line-gutter"].scrollTop = elements["code-input"].scrollTop; });
   elements["run-button"].addEventListener("click", runVisualization);
   elements["previous-button"].addEventListener("click", () => stepBy(-1));
@@ -405,6 +504,9 @@ function bindEvents() {
     elements["sample-input"].value = selectedAlgorithm === "binary_search" ? "1, 3, 5, 7, 9, 11" : selectedAlgorithm === "two_pointers" ? "1, 2, 4, 6, 8, 9" : "2, 4, 6, 8, 10";
     elements["target-input"].value = selectedAlgorithm === "binary_search" ? "7" : "10";
     elements["window-input"].value = "3";
+    updateInputSummary();
+    syncCodeSample();
+    scheduleTraceRefresh();
   });
   elements["new-session"].addEventListener("click", () => { setAlgorithm("sum"); showToast("New visualization session ready."); });
   elements["share-button"].addEventListener("click", async () => {
